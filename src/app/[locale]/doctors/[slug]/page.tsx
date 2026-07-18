@@ -143,31 +143,117 @@ export default async function DoctorDetailPage({ params }: DoctorDetailPageProps
               </p>
             </div>
 
-            {/* Qualifications Card */}
+            {/* Specialties & Services Card */}
             <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm">
               <h2 className="text-lg font-bold text-slate-800 border-b border-gray-100 pb-3 mb-4">
-                {tDocs('qualifications')}
+                {isRtl ? 'التخصصات والخدمات العلاجية' : 'Specialties & Medical Services'}
               </h2>
-              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base text-slate-600 font-cairo">
-                <li>
-                  {isRtl 
-                    ? `شهادة البورد في تخصص ${spec ? spec.name_ar : ''}`
-                    : `Board Certification in ${spec ? spec.name_en : ''}`
-                  }
-                </li>
-                <li>
-                  {isRtl
-                    ? `عضوية نقابة الأطباء الأردنية والجمعية الطبية ذات الاختصاص`
-                    : `Member of Jordan Medical Association and relevant Specialty Society`
-                  }
-                </li>
-                <li>
-                  {isRtl 
-                    ? `شهادات مشاركة وحضور لمؤتمرات طبية دولية ومحلية متخصصة`
-                    : `Certificates of attendance for international and local medical conferences`
-                  }
-                </li>
-              </ul>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-700 mb-2">{isRtl ? 'مجالات التركيز الرئيسي:' : 'Primary Focus Areas:'}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="bg-teal-50 text-teal-700 px-3 py-1 rounded-xl text-xs font-bold border border-teal-100/50">
+                      {spec ? (isRtl ? spec.name_ar : spec.name_en) : ''}
+                    </span>
+                    <span className="bg-slate-50 text-slate-600 px-3 py-1 rounded-xl text-xs font-semibold">
+                      {isRtl ? 'التدخلات الجراحية الدقيقة' : 'Minimally Invasive Interventions'}
+                    </span>
+                    <span className="bg-slate-50 text-slate-600 px-3 py-1 rounded-xl text-xs font-semibold">
+                      {isRtl ? 'الرعاية الوقائية والمتابعة' : 'Preventative Care & Follow-ups'}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-700 mb-2">{isRtl ? 'الخدمات المتوفرة في العيادة:' : 'Services Offered in Clinic:'}</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm font-semibold text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-teal-600"></span>
+                      <span>{isRtl ? 'الفحص السريري والاستشارة الشاملة' : 'Clinical Examination & Consultation'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-teal-600"></span>
+                      <span>{isRtl ? 'تخطيط وظائف الجسم الحيوي' : 'Vital Functions Diagnostics'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-teal-600"></span>
+                      <span>{isRtl ? 'علاجات الحالات الطارئة والمستعصية' : 'Chronic and Emergency Management'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-teal-600"></span>
+                      <span>{isRtl ? 'إصدار التقارير الطبية للمرضى الدوليين' : 'Medical Reports for International Patients'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Experience & Certificates */}
+            <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-800 border-b border-gray-100 pb-3 mb-4">
+                {isRtl ? 'الخبرات العلمية والشهادات' : 'Experience & Certifications'}
+              </h2>
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="w-1 rounded bg-teal-500 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm sm:text-base">{isRtl ? 'شهادة البورد والأكاديمية' : 'Academic & Board Certificates'}</h4>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      {isRtl 
+                        ? `حاصل على شهادة البورد في تخصص ${spec ? spec.name_ar : ''}، بالإضافة لزمالات من كليات الطب العالمية.`
+                        : `Board Certified Specialist in ${spec ? spec.name_en : ''}, with fellowships from global institutions.`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-1 rounded bg-slate-300 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm sm:text-base">{isRtl ? 'مسيرة الخبرة المهنية' : 'Professional Work Journey'}</h4>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      {isRtl 
+                        ? `خبرة تتجاوز ${doc.experience_years} سنة عمل خلالها في كبرى المستشفيات والمراكز التخصصية التابعة للمؤسسات الطبية المعتمدة في الأردن وخارجها.`
+                        : `Exceeding ${doc.experience_years} years of work at major hospitals and specialist centers attached to accredited institutions in Jordan and internationally.`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Timings & Location Map */}
+            <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-800 border-b border-gray-100 pb-3 mb-4">
+                {isRtl ? 'موقع العيادة ومواعيد العمل' : 'Clinic Location & Timings'}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold text-slate-700">{isRtl ? 'أوقات الدوام الأسبوعي:' : 'Weekly Work Hours:'}</h3>
+                  <div className="space-y-1.5 text-xs sm:text-sm text-slate-600 font-semibold">
+                    <div className="flex justify-between">
+                      <span>{isRtl ? 'من السبت إلى الأربعاء' : 'Saturday - Wednesday'}</span>
+                      <span className="text-teal-600">09:00 AM - 05:00 PM</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>{isRtl ? 'الخميس' : 'Thursday'}</span>
+                      <span className="text-teal-600">09:00 AM - 01:00 PM</span>
+                    </div>
+                    <div className="flex justify-between text-slate-400">
+                      <span>{isRtl ? 'الجمعة' : 'Friday'}</span>
+                      <span>{isRtl ? 'عطلة نهاية الأسبوع' : 'Weekend Holiday'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold text-slate-700">{isRtl ? 'العنوان الجغرافي:' : 'Physical Address:'}</h3>
+                  <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                    {isRtl ? doc.address_ar : doc.address_en}
+                  </p>
+                  {/* Simulated Map */}
+                  <div className="w-full h-28 bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 text-xs font-bold gap-1.5 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+                    <MapPin className="h-4 w-4 text-teal-600 animate-bounce" />
+                    <span>{isRtl ? 'موقع GPS الافتراضي نشط' : 'Simulated GPS Coordinate Active'}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Hospital Affiliation Card */}
@@ -205,6 +291,35 @@ export default async function DoctorDetailPage({ params }: DoctorDetailPageProps
                 <div className="flex gap-2">
                   <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-xs font-bold">العربية (Arabic)</span>
                   <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-xs font-bold">English (الإنجليزية)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* FAQs */}
+            <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-800 border-b border-gray-100 pb-3 mb-4">
+                {isRtl ? 'الأسئلة الشائعة حول العيادة' : 'Frequently Asked Questions'}
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h4 className="font-bold text-slate-800 text-sm sm:text-base">
+                    {isRtl ? 'س. هل يتم قبول التأمين الطبي؟' : 'Q. Does this clinic accept medical insurance?'}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+                    {isRtl 
+                      ? 'نعم، يقبل الطبيب معظم جهات التأمين الطبي المحلية والدولية، يرجى تزويد موظف الاستقبال ببطاقة التأمين عند الزيارة.'
+                      : 'Yes, the doctor accepts most local and international medical insurances. Please present your card upon arrival.'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-bold text-slate-800 text-sm sm:text-base">
+                    {isRtl ? 'س. كيف يمكن للمرضى الدوليين التنسيق؟' : 'Q. How do international patients coordinate treatment?'}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+                    {isRtl 
+                      ? 'إذا كنت خارج الأردن، يمكنك طلب خطة علاجية عبر نموذج السياحة العلاجية، وسيقوم فريقنا بالتنسيق المباشر مع عيادة الطبيب مجاناً.'
+                      : 'If you are outside Jordan, request coordination via our Medical Tourism form, and our team will contact this clinic for free.'}
+                  </p>
                 </div>
               </div>
             </div>

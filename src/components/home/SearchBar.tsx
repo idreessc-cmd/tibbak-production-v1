@@ -1,82 +1,161 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { Search, Stethoscope, Building2 } from 'lucide-react';
+import { Search, Stethoscope, MapPin, Building2, User } from 'lucide-react';
+import { City, Specialty, Hospital } from '@/types';
 
-export default function SearchBar() {
-  const t = useTranslations('home');
+interface SearchBarProps {
+  specialties: Specialty[];
+  cities: City[];
+  hospitals: Hospital[];
+}
+
+export default function SearchBar({ specialties, cities, hospitals }: SearchBarProps) {
   const locale = useLocale();
+  const isRtl = locale === 'ar';
   const router = useRouter();
-  const [searchType, setSearchType] = useState<'doctor' | 'hospital'>('doctor');
-  const [query, setQuery] = useState('');
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSpecialty, setSelectedSpecialty] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedHospital, setSelectedHospital] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
 
-    if (searchType === 'doctor') {
-      router.push(`/doctors?search=${encodeURIComponent(query)}`);
-    } else {
-      router.push(`/hospitals?search=${encodeURIComponent(query)}`);
+    const queryParams = [];
+    if (searchQuery.trim()) {
+      queryParams.push(`search=${encodeURIComponent(searchQuery.trim())}`);
     }
+    if (selectedSpecialty) {
+      queryParams.push(`specialty=${encodeURIComponent(selectedSpecialty)}`);
+    }
+    if (selectedCity) {
+      queryParams.push(`city=${encodeURIComponent(selectedCity)}`);
+    }
+    if (selectedHospital) {
+      queryParams.push(`hospital=${encodeURIComponent(selectedHospital)}`);
+    }
+
+    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+    router.push(`/doctors${queryString}`);
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 glassmorphism">
-      {/* Search Tabs */}
-      <div className="flex gap-2 mb-4 border-b border-gray-100 pb-3">
-        <button
-          onClick={() => setSearchType('doctor')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-            searchType === 'doctor'
-              ? 'bg-teal-600 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <Stethoscope className="h-4 w-4" />
-          {t('find_doctor')}
-        </button>
-        <button
-          onClick={() => setSearchType('hospital')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-            searchType === 'hospital'
-              ? 'bg-teal-600 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <Building2 className="h-4 w-4" />
-          {t('find_hospital')}
-        </button>
-      </div>
+    <div className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl border border-gray-100 p-5 sm:p-7 glassmorphism animate-fade-in relative z-20">
+      
+      {/* Booking Form Layout */}
+      <form onSubmit={handleSearch} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          
+          {/* Specialty Dropdown */}
+          <div className="flex flex-col space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 px-1">
+              <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
+              <span>{isRtl ? 'التخصص الطبي' : 'Specialty'}</span>
+            </label>
+            <div className="relative">
+              <select
+                value={selectedSpecialty}
+                onChange={(e) => setSelectedSpecialty(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-2xl py-3 px-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all appearance-none cursor-pointer"
+              >
+                <option value="">{isRtl ? 'كل التخصصات' : 'All Specialties'}</option>
+                {specialties.map((spec) => (
+                  <option key={spec.id} value={spec.slug}>
+                    {isRtl ? spec.name_ar : spec.name_en}
+                  </option>
+                ))}
+              </select>
+              <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 border-l border-slate-200 ${isRtl ? 'pl-2 border-r-0 pr-0' : 'pl-2'} flex items-center`}>
+                <span className="text-[10px]">▼</span>
+              </div>
+            </div>
+          </div>
 
-      {/* Search Input Form */}
-      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className={`absolute ${locale === 'ar' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5`} />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={
-              searchType === 'doctor'
-                ? t('search_doctor_placeholder')
-                : t('search_hospital_placeholder')
-            }
-            className={`w-full ${
-              locale === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'
-            } py-3.5 bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 text-slate-800 text-sm sm:text-base transition-all`}
-          />
+          {/* Doctor Name Search */}
+          <div className="flex flex-col space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 px-1">
+              <User className="h-3.5 w-3.5 text-teal-600" />
+              <span>{isRtl ? 'اسم الطبيب' : 'Doctor Name'}</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={isRtl ? 'مثال: أحمد، سارة...' : 'e.g. Ahmed, Sara...'}
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-2xl py-3 px-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+              />
+            </div>
+          </div>
+
+          {/* City Dropdown */}
+          <div className="flex flex-col space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 px-1">
+              <MapPin className="h-3.5 w-3.5 text-teal-600" />
+              <span>{isRtl ? 'المدينة / المحافظة' : 'City / Governorate'}</span>
+            </label>
+            <div className="relative">
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-2xl py-3 px-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all appearance-none cursor-pointer"
+              >
+                <option value="">{isRtl ? 'كل المدن' : 'All Cities'}</option>
+                {cities.map((city) => (
+                  <option key={city.id} value={city.slug}>
+                    {isRtl ? city.name_ar : city.name_en}
+                  </option>
+                ))}
+              </select>
+              <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 border-l border-slate-200 ${isRtl ? 'pl-2 border-r-0 pr-0' : 'pl-2'} flex items-center`}>
+                <span className="text-[10px]">▼</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Hospital Dropdown */}
+          <div className="flex flex-col space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 px-1">
+              <Building2 className="h-3.5 w-3.5 text-teal-600" />
+              <span>{isRtl ? 'المستشفى' : 'Hospital'}</span>
+            </label>
+            <div className="relative">
+              <select
+                value={selectedHospital}
+                onChange={(e) => setSelectedHospital(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-2xl py-3 px-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all appearance-none cursor-pointer"
+              >
+                <option value="">{isRtl ? 'كل المستشفيات' : 'All Hospitals'}</option>
+                {hospitals.map((hosp) => (
+                  <option key={hosp.id} value={hosp.slug}>
+                    {isRtl ? hosp.name_ar : hosp.name_en}
+                  </option>
+                ))}
+              </select>
+              <div className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 border-l border-slate-200 ${isRtl ? 'pl-2 border-r-0 pr-0' : 'pl-2'} flex items-center`}>
+                <span className="text-[10px]">▼</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <button
-          type="submit"
-          className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base"
-        >
-          <Search className="h-4.5 w-4.5" />
-          <span>{locale === 'ar' ? 'بحث' : 'Search'}</span>
-        </button>
+
+        {/* Submit Search Button */}
+        <div className="pt-2 flex justify-end">
+          <button
+            type="submit"
+            className="w-full md:w-auto bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold px-10 py-3.5 rounded-2xl transition-all shadow-lg hover:shadow-teal-500/10 flex items-center justify-center gap-2"
+          >
+            <Search className="h-5 w-5" />
+            <span className="text-base">{isRtl ? 'ابحث الآن' : 'Search Now'}</span>
+          </button>
+        </div>
       </form>
+
     </div>
   );
 }

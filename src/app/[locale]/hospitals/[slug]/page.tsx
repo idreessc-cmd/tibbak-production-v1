@@ -178,6 +178,23 @@ export default async function HospitalDetailPage({ params }: HospitalDetailPageP
               </ul>
             </div>
 
+            {/* Map Location Card */}
+            <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-800 border-b border-gray-100 pb-3 mb-4 font-cairo">
+                {isRtl ? 'الموقع الجغرافي وخريطة الوصول' : 'Geographical Location & Map'}
+              </h2>
+              <div className="space-y-4">
+                <p className="text-sm text-slate-500 font-semibold leading-relaxed">
+                  {isRtl ? hosp.address_ar : hosp.address_en}
+                </p>
+                <div className="w-full h-40 bg-slate-100 rounded-2xl border border-slate-200 flex items-center justify-center text-slate-400 text-xs font-bold gap-1.5 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+                  <MapPin className="h-5 w-5 text-teal-600 animate-bounce" />
+                  <span>{isRtl ? 'موقع المستشفى على الخريطة (GPS)' : 'Hospital Location Map (GPS)'}</span>
+                </div>
+              </div>
+            </div>
+
             {/* Affiliated Doctors tab */}
             <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm">
               <h2 className="text-lg font-bold text-slate-800 border-b border-gray-100 pb-3 mb-6 font-cairo">

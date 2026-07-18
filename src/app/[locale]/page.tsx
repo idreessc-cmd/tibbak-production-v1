@@ -49,7 +49,11 @@ export default async function HomePage({ params }: HomePageProps) {
             {t('hero_subtitle')}
           </p>
 
-          <SearchBar />
+          <SearchBar 
+            specialties={mockSpecialties}
+            cities={mockCities}
+            hospitals={allHospitals}
+          />
 
           {/* Quick Actions */}
           <div className="flex flex-wrap justify-center gap-4 mt-8">

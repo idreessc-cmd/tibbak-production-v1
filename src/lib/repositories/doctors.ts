@@ -4,6 +4,7 @@ import { mockSpecialties } from '@/data/mock/specialties';
 import { mockCities } from '@/data/mock/cities';
 import { mockPackages } from '@/data/mock/packages';
 import { mockProviderContacts } from '@/data/mock/provider-contacts';
+import { mockHospitals } from '@/data/mock/hospitals';
 
 // Simple global in-memory leads array to simulate leads tracking and limit checks
 export const inMemoryLeads: ContactLead[] = [];
@@ -11,10 +12,15 @@ export const inMemoryLeads: ContactLead[] = [];
 export interface DoctorFilter {
   specialtySlug?: string;
   citySlug?: string;
+  hospitalSlug?: string;
   gender?: 'male' | 'female';
   feesRange?: 'under_20' | '20_40' | 'above_40';
   rank?: 'verified' | 'premium' | 'vip';
   searchQuery?: string;
+  acceptsInsurance?: boolean;
+  availableToday?: boolean;
+  onlineConsultation?: boolean;
+  experienceYears?: '5_plus' | '10_plus' | '20_plus';
 }
 
 export interface DoctorSort {
@@ -46,6 +52,15 @@ export async function getAllDoctors(filter?: DoctorFilter, sort?: DoctorSort): P
       }
     }
 
+    if (filter.hospitalSlug) {
+      const hospital = mockHospitals.find(h => h.slug === filter.hospitalSlug);
+      if (hospital) {
+        results = results.filter(d => d.hospital_id === hospital.id);
+      } else {
+        return [];
+      }
+    }
+
     if (filter.gender) {
       results = results.filter(d => d.gender === filter.gender);
     }
@@ -62,6 +77,30 @@ export async function getAllDoctors(filter?: DoctorFilter, sort?: DoctorSort): P
 
     if (filter.rank) {
       results = results.filter(d => d.rank === filter.rank);
+    }
+
+    if (filter.acceptsInsurance) {
+      // In mock model, VIP and Premium doctors accept insurance
+      results = results.filter(d => d.rank === 'vip' || d.rank === 'premium');
+    }
+
+    if (filter.availableToday) {
+      // available today for booking: let's filter deterministically
+      results = results.filter(d => d.is_verified);
+    }
+
+    if (filter.onlineConsultation) {
+      results = results.filter(d => d.accepts_consultation);
+    }
+
+    if (filter.experienceYears) {
+      if (filter.experienceYears === '5_plus') {
+        results = results.filter(d => d.experience_years >= 5);
+      } else if (filter.experienceYears === '10_plus') {
+        results = results.filter(d => d.experience_years >= 10);
+      } else if (filter.experienceYears === '20_plus') {
+        results = results.filter(d => d.experience_years >= 20);
+      }
     }
 
     if (filter.searchQuery) {
