@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# منصة طبّك الأردن (Tabibak Jordan) - Clean Production MVP V1
 
-## Getting Started
+منصة رقمية رائدة متخصصة في **السياحة العلاجية وربط المرضى بمزودي الرعاية الطبية في الأردن**، تم بناؤها من الصفر كنسخة إنتاجية أولية عالية الجودة (High-Fidelity MVP) تحاكي تجربة الاستخدام السلسة والبحث الفوري لمنصات عالمية مثل Zocdoc و Booking.com.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 فلسفة المنصة وهدفها
+الموقع ليس مجرد دليل تقليدي، بل هو **محرك حجز مباشر ومقارنة متكاملة** يهدف لمساعدة المريض (من داخل الأردن أو الخارج) على اتخاذ قراره العلاجي في أقل من دقيقة، من خلال عرض معلومات دقيقة وتفصيلية عن الأطباء والأسعار والمستشفيات والاعتمادات.
+
+---
+
+## 🛠️ التقنيات والمواصفات الفنية
+تم تطوير المنصة باعتماد أعلى المعايير الفنية الحديثة:
+* **Next.js 15 (App Router)**: إصدار `15.5.20` مع استغلال الـ Server Components بشكل افتراضي لتحقيق أقصى سرعة تحميل وتوافق تام مع الـ SEO.
+* **TypeScript Strict**: كتابة برمجية آمنة بنسبة 100% وخالية من نوع `any`.
+* **Tailwind CSS**: تصميم عصري تفاعلي (Responsive & Mobile-First) بلمسات جمالية مريحة وهوية بصرية طبية احترافية.
+* **next-intl**: دعم كامل ومترجم ثنائي الاتجاه للغتين **العربية (RTL)** و **الإنجليزية (LTR)**.
+* **Decoupled Architecture (Repositories)**: واجهات الصفحات لا تتعامل مع البيانات مباشرة، بل تستدعي طبقة مستودعات وسيطة (`Repositories`) مما يتيح ربط قاعدة البيانات الحقيقية (Supabase) لاحقاً خلال دقائق دون الحاجة لتغيير كود الصفحات.
+
+---
+
+## 📂 هيكلية دليل المجلدات والملفات
+```
+tibbak-production-v1/
+├── messages/                 # ملفات الترجمة وحزم اللغات (ar.json / en.json)
+├── public/                   # الأيقونات والشعارات والصور التعريفية
+├── src/
+│   ├── app/                  # مسارات صفحات الـ App Router المحلية والدولية
+│   │   ├── [locale]/         # مسار اللغة الديناميكي (عربي / إنجليزي)
+│   │   │   ├── contact/      # صفحة الدعم والتواصل
+│   │   │   ├── dashboard/    # لوحات تحكم Placeholders للمدير، الطبيب، المستشفى
+│   │   │   ├── doctors/      # دليل الأطباء، الفلترة المتقدمة، وملفات الأطباء
+│   │   │   ├── hospitals/    # دليل المستشفيات وأقسامها المعتمدة
+│   │   │   ├── international-treatment/ # نموذج السياحة العلاجية
+│   │   │   ├── join-doctor/   # طلب انضمام عيادة طبيب
+│   │   │   ├── join-hospital/ # طلب انضمام مركز طبي/مستشفى
+│   │   │   └── packages/     # باقات الاشتراك والترقية للمزودين
+│   ├── components/           # المكونات التفاعلية المجزأة (Modular Components)
+│   │   ├── doctors/          # فلاتر ونوافذ حجز الأطباء
+│   │   ├── home/             # شريط البحث الحركي المتطور
+│   │   ├── hospitals/        # نوافذ حجز وزيارة المستشفيات
+│   │   └── layout/           # الهيدر والفوتر والتبديل اللغوي
+│   ├── data/
+│   │   └── mock/             # قاعدة البيانات الوهمية (Seeded with 100 Doctors, 20 Hospitals, 25 Specialties)
+│   ├── i18n/                 # إعدادات لغات next-intl
+│   ├── lib/
+│   │   └── repositories/     # مستودعات البيانات المعزولة (القلب النابض للبيانات)
+│   └── types/                # تعريفات TypeScript ونماذج البيانات (Entities)
+├── middleware.ts             # توجيه اللغات الافتراضي
+└── next.config.ts            # تكوين وإعدادات الـ Next.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📊 قاعدة البيانات الوهمية (Mock Database)
+لتوفير عرض إنتاجي حقيقي أمام المستثمرين والأطباء، تم برمجة سكربت توليد بيانات تفرز:
+* **١٠٠ طبيب** حقيقي بأسماء وسنوات خبرة (٥ إلى ٣٨ سنة) وأسعار كشفية واقعية وعيادات موزعة.
+* **٢٠ مستشفى** رائد في الأردن مجهزة بقوائم الأقسام والاعتمادات.
+* **٢٥ تخصصاً طبياً** تغطي كافة مجالات العلاج والجراحة.
+* **جميع المحافظات الـ ١٢** في الأردن (عمان، إربد، الزرقاء، العقبة، السلط، الكرك، الطفيلة، معان، مادبا، جرش، عجلون، المفرق).
+* **إدارة الاتصالات**: أرقام تواصل وواتساب مشفرة ومحجوبة تلقائياً للأطباء المشتركين في الباقة المجانية بعد تجاوز العميل لـ ٣ طلبات تواصل لحماية المردود التجاري للمنصة.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🚀 تشغيل المشروع محلياً
+تأكد من تنصيب بيئة العمل `Node.js` ثم نفذ الخطوات التالية:
 
-To learn more about Next.js, take a look at the following resources:
+1. **تحميل التبعيات والملفات**:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **تشغيل خادم التطوير**:
+   ```bash
+   npm run dev
+   ```
+   افتح الرابط المباشر: [http://localhost:3000](http://localhost:3000)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **اختبار البناء النهائي والإنتاج**:
+   ```bash
+   npm run build
+   ```
+   سيقوم المترجم بفحص سلامة الأكواد بالكامل وتصدير الصفحات الثابتة (Static Generation) بنجاح 100%.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📈 خطة العمل القادمة (Next Phases)
+1. **المرحلة الأولى (الحالية - تم إنجازها بنجاح)**: بناء كامل الواجهات التفاعلية والأدوات وربطها بالـ Repositories مع Seeding متكامل وقنوات ترجمة وحجز وهمي.
+2. **المرحلة الثانية**: ربط جداول Supabase واستبدال واجهة الـ API داخل الـ Repositories.
+3. **المرحلة الثالثة**: تفعيل نظام حماية البيانات (RLS) ومصادقة المستخدمين (Supabase Auth).
