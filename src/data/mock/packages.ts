@@ -1,94 +1,67 @@
 import { Package } from '@/types';
 
 export const mockPackages: Package[] = [
+  // Doctor packages
   {
-    id: 'e5e3966e-21ef-42f3-a7bb-4e9df1111111',
-    name_ar: 'مجاني',
-    name_en: 'Free',
-    type: 'doctor',
-    tier: 'free',
-    price_jod: 0.00,
-    contact_limit: 3,
-    ranking_boost: 0,
-    allow_direct_contact: false,
-    features: ['عرض أساسي بالبحث', '3 تواصلات شهرياً فقط', 'تلقي طلبات تواصل مخفية بعد التخطي'],
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    id: 'pkg-doc-free',
+    name_ar: 'الباقة المجانية',
+    name_en: 'Free Package',
+    role: 'doctor',
+    price_monthly: 0,
+    lead_limit: 3,
+    features_ar: ['رؤية أول 3 محادثات شهرياً فقط', 'حجب بيانات المريض بعد الحد المسموح', 'إخفاء أرقام الهواتف والإيميلات'],
+    features_en: ['View first 3 chats per month only', 'Gated patient details after limit', 'Masked patient contact details']
   },
   {
-    id: 'e5e3966e-21ef-42f3-a7bb-4e9df2222222',
-    name_ar: 'مميز',
-    name_en: 'Premium',
-    type: 'doctor',
-    tier: 'premium',
-    price_jod: 29.99,
-    contact_limit: 50,
-    ranking_boost: 20,
-    allow_direct_contact: true,
-    features: ['ظهور أعلى بمرتين في نتائج البحث', 'شارة تميز بجانب الاسم والصورة', '50 تواصل كامل البيانات شهرياً', 'اتصال هاتفي وواتساب مباشر لجميع الزوار', 'إحصائيات تفاعلية مبسطة'],
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    id: 'pkg-doc-premium',
+    name_ar: 'الباقة المتميزة (Premium)',
+    name_en: 'Premium Package',
+    role: 'doctor',
+    price_monthly: 49,
+    lead_limit: -1,
+    features_ar: ['محادثات وحجوزات غير محدودة', 'إظهار بيانات المرضى كاملة', 'لوحة تحكم وتحليلات متقدمة', 'تقارير الإيرادات و CTR'],
+    features_en: ['Unlimited chats & bookings', 'Unmasked patient details unlocked', 'Advanced analytics dashboard', 'Revenue & CTR reports']
   },
   {
-    id: 'e5e3966e-21ef-42f3-a7bb-4e9df3333333',
-    name_ar: 'VIP',
-    name_en: 'VIP',
-    type: 'doctor',
-    tier: 'vip',
-    price_jod: 79.99,
-    contact_limit: 999,
-    ranking_boost: 50,
-    allow_direct_contact: true,
-    features: ['أولوية ظهور قصوى (المركز الأول في التخصص والمدينة)', 'شارة VIP مع التاج الذهبي', 'تواصلات ومكالمات غير محدودة', 'الترويج بالصفحة الرئيسية للمنصة', 'استقبال طلبات السياحة العلاجية للمرضى الدوليين', 'تقارير أداء وإحصائيات متقدمة'],
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    id: 'pkg-doc-vip',
+    name_ar: 'باقة كبار الشخصيات (VIP)',
+    name_en: 'VIP Package',
+    role: 'doctor',
+    price_monthly: 149,
+    lead_limit: -1,
+    features_ar: ['محادثات غير محدودة وبيانات كاملة', 'أولوية الظهور في نتائج البحث (Booster)', 'شارة VIP على بطاقة التعريف', 'إعلانات على الصفحة الرئيسية للمنصة'],
+    features_en: ['Unlimited chats & full details', 'Priority search listing booster', 'VIP Badge on profile card', 'Homepage banner advertisement placement']
+  },
+  
+  // Hospital packages
+  {
+    id: 'pkg-hosp-basic',
+    name_ar: 'الباقة الأساسية للمستشفيات',
+    name_en: 'Hospital Basic',
+    role: 'hospital',
+    price_monthly: 99,
+    lead_limit: -1,
+    features_ar: ['إدارة الأطباء المعتمدين والأقسام', 'إدارة سعة الأسرة وجدول العمليات', 'تلقي طلبات الحجز العامة'],
+    features_en: ['Manage accredited doctors & departments', 'Manage bed capacity & surgery schedules', 'Receive general booking requests']
   },
   {
-    id: 'e5e3966e-21ef-42f3-a7bb-4e9df4444444',
-    name_ar: 'أساسي',
-    name_en: 'Basic',
-    type: 'hospital',
-    tier: 'free', // mapped to basic
-    price_jod: 49.99,
-    contact_limit: 20,
-    ranking_boost: 10,
-    allow_direct_contact: false,
-    features: ['صفحة مستشفى تعريفية أساسية', 'ظهور عادي في نتائج البحث', 'عرض التخصصات والأقسام العامة للمستشفى', 'تلقي 20 تواصل شهرياً'],
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    id: 'pkg-hosp-premium',
+    name_ar: 'الباقة المتقدمة للمستشفيات',
+    name_en: 'Hospital Premium',
+    role: 'hospital',
+    price_monthly: 249,
+    lead_limit: -1,
+    features_ar: ['لوحة تحكم إدارية كاملة وعروض ترويجية', 'تقارير أداء ومعدلات تحويل', 'نشر العروض الطبية والخصومات الخاصة'],
+    features_en: ['Full admin dashboard & promotions', 'Performance & conversion reports', 'Publish medical deals & special discounts']
   },
   {
-    id: 'e5e3966e-21ef-42f3-a7bb-4e9df5555555',
-    name_ar: 'مميز',
-    name_en: 'Premium',
-    type: 'hospital',
-    tier: 'premium',
-    price_jod: 149.99,
-    contact_limit: 100,
-    ranking_boost: 30,
-    allow_direct_contact: true,
-    features: ['ظهور مرتفع ومميز في البحث', 'verified badge لتوثيق الحساب', 'تلقي 100 تواصل شهرياً', 'معرض صور وفيديوهات للمستشفى والأجهزة', 'ربط الأطباء المعتمدين بصفحة المستشفى', 'استقبال حجوزات وزيارات عيادات المستشفى'],
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: 'e5e3966e-21ef-42f3-a7bb-4e9df6666666',
-    name_ar: 'International Partner',
-    name_en: 'International Partner',
-    type: 'hospital',
-    tier: 'international',
-    price_jod: 249.99,
-    contact_limit: 999,
-    ranking_boost: 60,
-    allow_direct_contact: true,
-    features: ['أولوية ترويج قصوى للمرضى الدوليين في الخارج', 'شارة شريك دولي (International Partner)', 'استقبال طلبات علاج دولية غير محدودة', 'الترويج الحصري في صفحات السياحة العلاجية والترويج الخارجي', 'عرض متكامل لخدمات المترجمين، الفنادق، واستقبال المطار'],
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    id: 'pkg-hosp-international',
+    name_ar: 'باقة شريك العلاج الدولي (SaaS + السياحة العلاجية)',
+    name_en: 'International Partner Package',
+    role: 'hospital',
+    price_monthly: 499,
+    lead_limit: -1,
+    features_ar: ['شريك علاج دولي معتمد', 'تلقي طلبات السياحة العلاجية الدولية مباشرة', 'ربط فندقي ولوجستي متقدم', 'دعم فني خاص 24/7'],
+    features_en: ['Accredited International Partner status', 'Receive international medical tourism cases', 'Advanced hotel & logistics coordination', 'Dedicated 24/7 technical support']
   }
 ];

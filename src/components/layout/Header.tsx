@@ -1,17 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
-import { Menu, X, Globe, HeartPulse, ChevronDown, Stethoscope, Building2 } from 'lucide-react';
+import { Menu, X, Globe, HeartPulse, Stethoscope } from 'lucide-react';
 
 export default function Header() {
-  const t = useTranslations('common');
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isJoinOpen, setIsJoinOpen] = useState(false);
 
   const switchLanguage = () => {
     const nextLocale = locale === 'ar' ? 'en' : 'ar';
@@ -19,11 +17,11 @@ export default function Header() {
   };
 
   const navLinks = [
-    { href: '/', label: t('home') },
-    { href: '/doctors', label: t('doctors') },
-    { href: '/hospitals', label: t('hospitals') },
-    { href: '/packages', label: t('packages') },
-    { href: '/international-treatment', label: t('international') },
+    { href: '/', label: locale === 'ar' ? 'الرئيسية' : 'Home' },
+    { href: '/search', label: locale === 'ar' ? 'البحث عن طبيب' : 'Find a Doctor' },
+    { href: '/search?service=hospital', label: locale === 'ar' ? 'المستشفيات' : 'Hospitals' },
+    { href: '/packages', label: locale === 'ar' ? 'باقات الاشتراك' : 'Packages' },
+    { href: '/demo', label: locale === 'ar' ? 'العرض التجريبي ⚠️' : 'Demo Hub ⚠️' }
   ];
 
   return (
@@ -58,50 +56,35 @@ export default function Header() {
           {/* Language Switcher */}
           <button
             onClick={switchLanguage}
-            className="flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors border border-gray-200 px-3 py-1.5 rounded-full hover:bg-slate-50"
+            className="flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors border border-gray-200 px-3 py-1.5 rounded-full hover:bg-slate-50 cursor-pointer"
             title={locale === 'ar' ? 'Switch to English' : 'التحويل للعربية'}
           >
             <Globe className="h-4 w-4" />
             <span>{locale === 'ar' ? 'English' : 'العربية'}</span>
           </button>
-
-          {/* Join dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsJoinOpen(!isJoinOpen)}
-              className="flex items-center gap-1 text-sm font-medium bg-teal-50 text-teal-700 px-4 py-2 rounded-lg hover:bg-teal-100 transition-colors"
-            >
-              <span>{locale === 'ar' ? 'سجل معنا' : 'Join Us'}</span>
-              <ChevronDown className="h-4 w-4" />
-            </button>
-
-            {isJoinOpen && (
-              <div className={`absolute ${locale === 'ar' ? 'left-0' : 'right-0'} mt-2 w-48 rounded-xl bg-white p-2 shadow-lg border border-gray-100 ring-1 ring-black/5`}>
-                <Link
-                  href="/join-doctor"
-                  onClick={() => setIsJoinOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
-                >
-                  <Stethoscope className="h-4 w-4 text-teal-600" />
-                  {t('join_doctor')}
-                </Link>
-                <Link
-                  href="/join-hospital"
-                  onClick={() => setIsJoinOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
-                >
-                  <Building2 className="h-4 w-4 text-teal-600" />
-                  {t('join_hospital')}
-                </Link>
-              </div>
-            )}
-          </div>
-
+ 
+          {/* For Doctors */}
           <Link
-            href="/contact"
-            className="text-sm font-medium bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+            href="/join-doctor"
+            className="text-sm font-semibold text-slate-650 hover:text-teal-600 transition-colors"
           >
-            {t('contact')}
+            {locale === 'ar' ? 'للأطباء' : 'For Doctors'}
+          </Link>
+ 
+          {/* Login Link */}
+          <Link
+            href="/login"
+            className="text-sm font-semibold text-slate-600 hover:text-teal-600 transition-colors"
+          >
+            {locale === 'ar' ? 'تسجيل الدخول' : 'Sign in'}
+          </Link>
+
+          {/* Demo access button */}
+          <Link
+            href="/demo"
+            className="text-sm font-bold bg-teal-600 text-white px-5 py-2 rounded-xl hover:bg-teal-700 transition-colors shadow-sm cursor-pointer font-cairo"
+          >
+            {locale === 'ar' ? 'دخول تجريبي' : 'Demo access'}
           </Link>
         </div>
 
@@ -149,25 +132,24 @@ export default function Header() {
             <Link
               href="/join-doctor"
               onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors font-cairo"
             >
               <Stethoscope className="h-5 w-5 text-teal-600" />
-              {t('join_doctor')}
+              {locale === 'ar' ? 'للأطباء' : 'For Doctors'}
             </Link>
             <Link
-              href="/join-hospital"
+              href="/login"
               onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+              className="block w-full text-center border border-teal-600 text-teal-600 px-4 py-2 rounded-lg font-medium hover:bg-teal-50 transition-colors font-cairo"
             >
-              <Building2 className="h-5 w-5 text-teal-600" />
-              {t('join_hospital')}
+              {locale === 'ar' ? 'تسجيل الدخول' : 'Sign in'}
             </Link>
             <Link
-              href="/contact"
+              href="/demo"
               onClick={() => setIsMenuOpen(false)}
-              className="block w-full text-center bg-teal-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors"
+              className="block w-full text-center bg-teal-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-700 transition-colors font-cairo"
             >
-              {t('contact')}
+              {locale === 'ar' ? 'دخول تجريبي' : 'Demo access'}
             </Link>
           </div>
         </div>

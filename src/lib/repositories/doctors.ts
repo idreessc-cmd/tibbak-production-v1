@@ -1,13 +1,11 @@
-import { Doctor, ContactLead } from '@/types';
+import { Doctor, DoctorSubscriptionPlan } from '@/types';
 import { mockDoctors } from '@/data/mock/doctors';
 import { mockSpecialties } from '@/data/mock/specialties';
 import { mockCities } from '@/data/mock/cities';
-import { mockPackages } from '@/data/mock/packages';
-import { mockProviderContacts } from '@/data/mock/provider-contacts';
 import { mockHospitals } from '@/data/mock/hospitals';
 
-// Simple global in-memory leads array to simulate leads tracking and limit checks
-export const inMemoryLeads: ContactLead[] = [];
+import { findSpecialtyForQuery } from '@/data/mock/symptom-specialty-map';
+import { sortDoctorsOrganic } from '@/lib/search/doctor-organic-ranking';
 
 export interface DoctorFilter {
   specialtySlug?: string;
@@ -15,7 +13,8 @@ export interface DoctorFilter {
   hospitalSlug?: string;
   gender?: 'male' | 'female';
   feesRange?: 'under_20' | '20_40' | 'above_40';
-  rank?: 'verified' | 'premium' | 'vip';
+  subscriptionPlan?: DoctorSubscriptionPlan;
+  isSponsored?: boolean;
   searchQuery?: string;
   acceptsInsurance?: boolean;
   availableToday?: boolean;
@@ -24,14 +23,20 @@ export interface DoctorFilter {
 }
 
 export interface DoctorSort {
-  sortBy?: 'ranking' | 'rating' | 'experience' | 'fees_asc' | 'fees_desc';
+  sortBy?: 'ranking' | 'rating' | 'experience' | 'fees_asc' | 'fees_desc' | 'earliest_date';
 }
+
+// In-memory array copy that allows admin operations to persist during session
+import { isProviderPubliclyVisible } from '@/lib/providers/provider-availability';
+
+export const activeMockDoctors: Doctor[] = [...mockDoctors];
+export const inMemoryDoctors: Doctor[] = activeMockDoctors;
 
 export async function getAllDoctors(filter?: DoctorFilter, sort?: DoctorSort): Promise<Doctor[]> {
   // Simulate network latency
-  await new Promise(resolve => setTimeout(resolve, 50));
+  await new Promise(resolve => setTimeout(resolve, 30));
 
-  let results = [...mockDoctors].filter(d => d.is_active && !d.deleted_at);
+  let results = activeMockDoctors.filter(d => isProviderPubliclyVisible(d));
 
   if (filter) {
     if (filter.specialtySlug) {
@@ -39,7 +44,7 @@ export async function getAllDoctors(filter?: DoctorFilter, sort?: DoctorSort): P
       if (specialty) {
         results = results.filter(d => d.specialty_id === specialty.id);
       } else {
-        return []; // specialty not found
+        return [];
       }
     }
 
@@ -75,22 +80,27 @@ export async function getAllDoctors(filter?: DoctorFilter, sort?: DoctorSort): P
       }
     }
 
-    if (filter.rank) {
-      results = results.filter(d => d.rank === filter.rank);
+    if (filter.subscriptionPlan) {
+      results = results.filter(d => d.subscriptionPlan === filter.subscriptionPlan);
+    }
+
+    if (filter.isSponsored !== undefined) {
+      results = results.filter(d => d.isSponsored === filter.isSponsored);
     }
 
     if (filter.acceptsInsurance) {
-      // In mock model, VIP and Premium doctors accept insurance
-      results = results.filter(d => d.rank === 'vip' || d.rank === 'premium');
-    }
-
-    if (filter.availableToday) {
-      // available today for booking: let's filter deterministically
-      results = results.filter(d => d.is_verified);
+      // VIP & Professional doctors support insurance
+      results = results.filter(d => d.subscriptionPlan === 'vip' || d.subscriptionPlan === 'professional');
     }
 
     if (filter.onlineConsultation) {
-      results = results.filter(d => d.accepts_consultation);
+      // Seed logic: odd indexes have telemedicine
+      results = results.filter(d => d.organicSortOrder % 2 === 1);
+    }
+
+    if (filter.availableToday) {
+      // Verified doctors are available today
+      results = results.filter(d => d.is_verified);
     }
 
     if (filter.experienceYears) {
@@ -105,127 +115,116 @@ export async function getAllDoctors(filter?: DoctorFilter, sort?: DoctorSort): P
 
     if (filter.searchQuery) {
       const query = filter.searchQuery.toLowerCase().trim();
+      const symptomMatch = findSpecialtyForQuery(query);
+      const mappedSpecId = symptomMatch ? symptomMatch.specialty_id : null;
+
+      const matchingSpecialtyIds = mockSpecialties
+        .filter(s => s.name_ar.toLowerCase().includes(query) || s.name_en.toLowerCase().includes(query) || s.slug.includes(query))
+        .map(s => s.id);
+
       results = results.filter(d => 
-        d.full_name_ar.includes(query) || 
-        d.full_name_en.toLowerCase().includes(query) ||
-        (d.title_ar && d.title_ar.includes(query)) ||
-        (d.title_en && d.title_en.toLowerCase().includes(query))
+        d.name_ar.toLowerCase().includes(query) || 
+        d.name_en.toLowerCase().includes(query) ||
+        d.title_ar.toLowerCase().includes(query) ||
+        d.title_en.toLowerCase().includes(query) ||
+        d.bio_ar.toLowerCase().includes(query) ||
+        d.bio_en.toLowerCase().includes(query) ||
+        (mappedSpecId && d.specialty_id === mappedSpecId) ||
+        matchingSpecialtyIds.includes(d.specialty_id)
       );
     }
   }
 
-  // Handle sorting
-  const sortBy = sort?.sortBy || 'ranking';
-  results.sort((a, b) => {
-    // Basic sorting ranking calculation: packages first (vip=3, premium=2, verified/standard=1)
-    const getPackageScore = (pkgId: string | null) => {
-      const pkg = mockPackages.find(p => p.id === pkgId);
-      if (!pkg) return 0;
-      if (pkg.tier === 'vip') return 300;
-      if (pkg.tier === 'premium') return 200;
-      return 100;
-    };
+  // Separate sponsored results at top if applicable, then sort organic
+  const sponsored = results.filter(d => d.isSponsored);
+  const organic = results.filter(d => !d.isSponsored);
 
-    if (sortBy === 'ranking') {
-      const scoreA = getPackageScore(a.package_id) + a.experience_years;
-      const scoreB = getPackageScore(b.package_id) + b.experience_years;
-      return scoreB - scoreA; // highest score first
-    }
-    if (sortBy === 'rating') {
-      return b.rating - a.rating;
-    }
-    if (sortBy === 'experience') {
-      return b.experience_years - a.experience_years;
-    }
-    if (sortBy === 'fees_asc') {
-      return a.consultation_fee_jod - b.consultation_fee_jod;
-    }
-    if (sortBy === 'fees_desc') {
-      return b.consultation_fee_jod - a.consultation_fee_jod;
-    }
-    return 0;
-  });
+  const sortedOrganic = sortDoctorsOrganic(organic, sort);
+  const sortedSponsored = sortDoctorsOrganic(sponsored, sort);
 
-  return results;
+  return [...sortedSponsored, ...sortedOrganic];
 }
 
 export async function getDoctorBySlug(slug: string): Promise<Doctor | null> {
-  await new Promise(resolve => setTimeout(resolve, 30));
-  const doc = mockDoctors.find(d => d.slug === slug && d.is_active && !d.deleted_at);
-  return doc || null;
+  await new Promise(resolve => setTimeout(resolve, 10));
+  const doc = activeMockDoctors.find(d => d.slug === slug);
+  if (!doc || !isProviderPubliclyVisible(doc)) return null;
+  return doc;
 }
 
 export async function getDoctorById(id: string): Promise<Doctor | null> {
-  const doc = mockDoctors.find(d => d.id === id && d.is_active && !d.deleted_at);
+  const doc = activeMockDoctors.find(d => d.id === id);
+  if (!doc || !isProviderPubliclyVisible(doc)) return null;
+  return doc;
+}
+
+export function getDoctorByIdIncludingUnavailable(id: string): Doctor | null {
+  const doc = activeMockDoctors.find(d => d.id === id);
   return doc || null;
 }
 
-// SECURE RPC SIMULATION: clicks on doctor phone/whatsapp
-export async function getDoctorContact(
-  doctorId: string,
-  leadType: 'phone' | 'whatsapp' | 'booking' | 'consultation' | 'international_request',
-  patientName?: string,
-  patientPhone?: string
-): Promise<{ phone: string | null; whatsapp: string | null; website: string | null; isDirectAllowed: boolean }> {
-  
-  const doctor = mockDoctors.find(d => d.id === doctorId);
-  if (!doctor) throw new Error('Doctor not found');
-
-  const pkg = mockPackages.find(p => p.id === doctor.package_id);
-  const allowDirect = pkg ? pkg.allow_direct_contact : false;
-  const leadLimit = pkg ? pkg.contact_limit : 3;
-
-  // Calculate current month lead count in memory
-  const currentMonthCount = inMemoryLeads.filter(l => l.doctor_id === doctorId).length;
-  
-  // Decide visibility
-  let isVisible = false;
-  let hiddenReason = null;
-
-  if (pkg?.tier === 'free') {
-    if (currentMonthCount < 3) {
-      isVisible = true;
-    } else {
-      isVisible = false;
-      hiddenReason = 'free plan monthly limit reached';
-    }
-  } else {
-    if (currentMonthCount < leadLimit) {
-      isVisible = true;
-    } else {
-      isVisible = false;
-      hiddenReason = 'plan monthly limit reached';
-    }
+// SaaS Admin Operations
+export function resetDoctorOrganicRankingFixtures(): void {
+  const docIdx = activeMockDoctors.findIndex(d => d.id === 'doc-1');
+  if (docIdx > -1) {
+    activeMockDoctors[docIdx].rating = 4.9;
+    activeMockDoctors[docIdx].organicSortOrder = 1;
   }
+}
 
-  // Create lead in-memory
-  const newLead: ContactLead = {
-    id: `lead-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    target_type: 'doctor',
-    doctor_id: doctorId,
-    hospital_id: null,
-    lead_type: leadType,
-    patient_name: patientName || 'Visitor',
-    patient_phone: patientPhone || '+962790000000',
-    patient_whatsapp: null,
-    is_visible_to_provider: isVisible,
-    hidden_reason: hiddenReason,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-  
-  inMemoryLeads.push(newLead);
-
-  // Fetch actual credentials from secure store
-  const contacts = mockProviderContacts.find(c => c.doctor_id === doctorId);
-  const phone = contacts ? contacts.phone : null;
-  const whatsapp = contacts ? contacts.whatsapp : null;
-  const website = contacts ? contacts.website : null;
-
-  if (allowDirect) {
-    return { phone, whatsapp, website, isDirectAllowed: true };
-  } else {
-    // If not allowed direct contact (e.g. Free package), we hide the numbers to the visitor
-    return { phone: null, whatsapp: null, website, isDirectAllowed: false };
+export async function adminUpdateDoctorOrganicSortOrder(id: string, sortOrder: number): Promise<boolean> {
+  const docIdx = activeMockDoctors.findIndex(d => d.id === id);
+  if (docIdx > -1) {
+    activeMockDoctors[docIdx] = { ...activeMockDoctors[docIdx], organicSortOrder: sortOrder };
+    return true;
   }
+  return false;
+}
+
+export async function adminUpdateDoctorSubscriptionPlan(id: string, plan: DoctorSubscriptionPlan, packageId?: string): Promise<boolean> {
+  const docIdx = activeMockDoctors.findIndex(d => d.id === id);
+  if (docIdx > -1) {
+    const pkg = packageId || (plan === 'free' ? 'pkg-free-1' : plan === 'professional' ? 'pkg-pro-1' : 'pkg-vip-1');
+    activeMockDoctors[docIdx] = { 
+      ...activeMockDoctors[docIdx], 
+      subscriptionPlan: plan,
+      package_id: pkg 
+    };
+    return true;
+  }
+  return false;
+}
+
+export async function adminUpdateDoctorVerification(id: string, isVerified: boolean): Promise<boolean> {
+  const docIdx = activeMockDoctors.findIndex(d => d.id === id);
+  if (docIdx > -1) {
+    activeMockDoctors[docIdx] = { ...activeMockDoctors[docIdx], is_verified: isVerified };
+    return true;
+  }
+  return false;
+}
+
+export async function adminToggleDoctorStatus(id: string): Promise<boolean> {
+  // We can simulate suspending a doctor by altering their name or setting flag.
+  // Let's toggle is_verified or suffix a tag to simulate status suspension
+  const docIdx = activeMockDoctors.findIndex(d => d.id === id);
+  if (docIdx > -1) {
+    // If name contains (Suspended) we restore it, otherwise we suspend it
+    const doc = activeMockDoctors[docIdx];
+    if (doc.name_en.includes('(Suspended)')) {
+      activeMockDoctors[docIdx] = {
+        ...doc,
+        name_en: doc.name_en.replace(' (Suspended)', ''),
+        name_ar: doc.name_ar.replace(' (موقوف)', '')
+      };
+    } else {
+      activeMockDoctors[docIdx] = {
+        ...doc,
+        name_en: doc.name_en + ' (Suspended)',
+        name_ar: doc.name_ar + ' (موقوف)'
+      };
+    }
+    return true;
+  }
+  return false;
 }

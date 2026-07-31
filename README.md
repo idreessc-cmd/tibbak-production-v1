@@ -1,90 +1,66 @@
-# منصة طبّك الأردن (Tabibak Jordan) - Clean Production MVP V1
+# طبّك | Tibbak — MENA Healthcare Marketplace MVP
 
-منصة رقمية رائدة متخصصة في **السياحة العلاجية وربط المرضى بمزودي الرعاية الطبية في الأردن**، تم بناؤها من الصفر كنسخة إنتاجية أولية عالية الجودة (High-Fidelity MVP) تحاكي تجربة الاستخدام السلسة والبحث الفوري لمنصات عالمية مثل Zocdoc و Booking.com.
-
----
-
-## 🚀 فلسفة المنصة وهدفها
-الموقع ليس مجرد دليل تقليدي، بل هو **محرك حجز مباشر ومقارنة متكاملة** يهدف لمساعدة المريض (من داخل الأردن أو الخارج) على اتخاذ قراره العلاجي في أقل من دقيقة، من خلال عرض معلومات دقيقة وتفصيلية عن الأطباء والأسعار والمستشفيات والاعتمادات.
+**Tibbak** is a specialized healthcare marketplace platform engineered for the Middle East and North Africa (MENA) region. It connects patients with verified medical specialists and accredited hospitals for domestic and international care.
 
 ---
 
-## 🛠️ التقنيات والمواصفات الفنية
-تم تطوير المنصة باعتماد أعلى المعايير الفنية الحديثة:
-* **Next.js 15 (App Router)**: إصدار `15.5.20` مع استغلال الـ Server Components بشكل افتراضي لتحقيق أقصى سرعة تحميل وتوافق تام مع الـ SEO.
-* **TypeScript Strict**: كتابة برمجية آمنة بنسبة 100% وخالية من نوع `any`.
-* **Tailwind CSS**: تصميم عصري تفاعلي (Responsive & Mobile-First) بلمسات جمالية مريحة وهوية بصرية طبية احترافية.
-* **next-intl**: دعم كامل ومترجم ثنائي الاتجاه للغتين **العربية (RTL)** و **الإنجليزية (LTR)**.
-* **Decoupled Architecture (Repositories)**: واجهات الصفحات لا تتعامل مع البيانات مباشرة، بل تستدعي طبقة مستودعات وسيطة (`Repositories`) مما يتيح ربط قاعدة البيانات الحقيقية (Supabase) لاحقاً خلال دقائق دون الحاجة لتغيير كود الصفحات.
+## 📌 Release Details
+
+- **Release Name**: Tibbak MVP Demo
+- **Version**: `0.1.0-mvp`
+- **Node.js Requirement**: `22.x` (Tested against Node `v22.16.0`)
+- **Framework**: Next.js `15.5.22` (App Router)
+- **Supported Locales**: Arabic (`ar` - Default) and English (`en`)
 
 ---
 
-## 📂 هيكلية دليل المجلدات والملفات
+## ⚡ Quick Start & Development
+
+```bash
+# 1. Clean Installation
+npm ci
+
+# 2. Start Local Development Server
+npm run dev
 ```
-tibbak-production-v1/
-├── messages/                 # ملفات الترجمة وحزم اللغات (ar.json / en.json)
-├── public/                   # الأيقونات والشعارات والصور التعريفية
-├── src/
-│   ├── app/                  # مسارات صفحات الـ App Router المحلية والدولية
-│   │   ├── [locale]/         # مسار اللغة الديناميكي (عربي / إنجليزي)
-│   │   │   ├── contact/      # صفحة الدعم والتواصل
-│   │   │   ├── dashboard/    # لوحات تحكم Placeholders للمدير، الطبيب، المستشفى
-│   │   │   ├── doctors/      # دليل الأطباء، الفلترة المتقدمة، وملفات الأطباء
-│   │   │   ├── hospitals/    # دليل المستشفيات وأقسامها المعتمدة
-│   │   │   ├── international-treatment/ # نموذج السياحة العلاجية
-│   │   │   ├── join-doctor/   # طلب انضمام عيادة طبيب
-│   │   │   ├── join-hospital/ # طلب انضمام مركز طبي/مستشفى
-│   │   │   └── packages/     # باقات الاشتراك والترقية للمزودين
-│   ├── components/           # المكونات التفاعلية المجزأة (Modular Components)
-│   │   ├── doctors/          # فلاتر ونوافذ حجز الأطباء
-│   │   ├── home/             # شريط البحث الحركي المتطور
-│   │   ├── hospitals/        # نوافذ حجز وزيارة المستشفيات
-│   │   └── layout/           # الهيدر والفوتر والتبديل اللغوي
-│   ├── data/
-│   │   └── mock/             # قاعدة البيانات الوهمية (Seeded with 100 Doctors, 20 Hospitals, 25 Specialties)
-│   ├── i18n/                 # إعدادات لغات next-intl
-│   ├── lib/
-│   │   └── repositories/     # مستودعات البيانات المعزولة (القلب النابض للبيانات)
-│   └── types/                # تعريفات TypeScript ونماذج البيانات (Entities)
-├── middleware.ts             # توجيه اللغات الافتراضي
-└── next.config.ts            # تكوين وإعدادات الـ Next.js
+
+Open [http://localhost:3000](http://localhost:3000) to view the application in your browser.
+
+---
+
+## 🧪 Verification & Build Pipeline
+
+```bash
+# Type Safety Verification
+npx tsc --noEmit
+
+# Linter Verification
+npm run lint
+
+# Production Security Audit
+npm audit --omit=dev
+
+# Production Build
+npm run build
 ```
 
 ---
 
-## 📊 قاعدة البيانات الوهمية (Mock Database)
-لتوفير عرض إنتاجي حقيقي أمام المستثمرين والأطباء، تم برمجة سكربت توليد بيانات تفرز:
-* **١٠٠ طبيب** حقيقي بأسماء وسنوات خبرة (٥ إلى ٣٨ سنة) وأسعار كشفية واقعية وعيادات موزعة.
-* **٢٠ مستشفى** رائد في الأردن مجهزة بقوائم الأقسام والاعتمادات.
-* **٢٥ تخصصاً طبياً** تغطي كافة مجالات العلاج والجراحة.
-* **جميع المحافظات الـ ١٢** في الأردن (عمان، إربد، الزرقاء، العقبة، السلط، الكرك، الطفيلة، معان، مادبا، جرش، عجلون، المفرق).
-* **إدارة الاتصالات**: أرقام تواصل وواتساب مشفرة ومحجوبة تلقائياً للأطباء المشتركين في الباقة المجانية بعد تجاوز العميل لـ ٣ طلبات تواصل لحماية المردود التجاري للمنصة.
+## 🔒 Security & Privacy Model
+
+- **Production Security**: `npm audit --omit=dev` reports **0 Critical, 0 High, 0 Moderate, 0 Low** vulnerabilities.
+- **Privacy-by-Design**: Contact details (`patient_phone`, `patient_email`, raw attachments) are structurally excluded from provider responses (`ProviderCaseSummary`) and admin views (`AdminCaseOperationalSummary`).
+- **Organic Ranking Independence**: Organic search ranking is strictly independent of commercial plan upgrades or paid sponsored campaigns.
 
 ---
 
-## 🚀 تشغيل المشروع محلياً
-تأكد من تنصيب بيئة العمل `Node.js` ثم نفذ الخطوات التالية:
+## 📑 Documentation Index
 
-1. **تحميل التبعيات والملفات**:
-   ```bash
-   npm install
-   ```
-
-2. **تشغيل خادم التطوير**:
-   ```bash
-   npm run dev
-   ```
-   افتح الرابط المباشر: [http://localhost:3000](http://localhost:3000)
-
-3. **اختبار البناء النهائي والإنتاج**:
-   ```bash
-   npm run build
-   ```
-   سيقوم المترجم بفحص سلامة الأكواد بالكامل وتصدير الصفحات الثابتة (Static Generation) بنجاح 100%.
-
----
-
-## 📈 خطة العمل القادمة (Next Phases)
-1. **المرحلة الأولى (الحالية - تم إنجازها بنجاح)**: بناء كامل الواجهات التفاعلية والأدوات وربطها بالـ Repositories مع Seeding متكامل وقنوات ترجمة وحجز وهمي.
-2. **المرحلة الثانية**: ربط جداول Supabase واستبدال واجهة الـ API داخل الـ Repositories.
-3. **المرحلة الثالثة**: تفعيل نظام حماية البيانات (RLS) ومصادقة المستخدمين (Supabase Auth).
+See [docs/README.md](docs/README.md) for the complete documentation catalog including:
+- `FINAL_RELEASE_MANIFEST.md`
+- `DEPENDENCY_RISK_REGISTER.md`
+- `EXECUTIVE_PRODUCT_BRIEF.md`
+- `TECHNICAL_HANDOFF.md`
+- `DEMO_PRESENTATION_SCRIPT.md`
+- `PRODUCTION_ROADMAP.md`
+- `DEPLOYMENT_CHECKLIST.md`

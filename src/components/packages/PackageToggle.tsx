@@ -95,8 +95,8 @@ export default function PackageToggle({ doctorPackages, hospitalPackages }: Pack
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
         {currentPackages.map((pkg) => {
           // Resolve icon
-          const isVip = pkg.tier === 'vip' || pkg.tier === 'international';
-          const isPremium = pkg.tier === 'premium';
+          const isVip = pkg.id.includes('vip') || pkg.id.includes('international');
+          const isPremium = pkg.id.includes('premium');
           
           return (
             <div
@@ -128,14 +128,14 @@ export default function PackageToggle({ doctorPackages, hospitalPackages }: Pack
                 </div>
 
                 <div className="flex items-baseline gap-1 my-4">
-                  <span className="text-4xl font-extrabold text-slate-900">{pkg.price_jod}</span>
+                  <span className="text-4xl font-extrabold text-slate-900">{pkg.price_monthly}</span>
                   <span className="text-sm font-semibold text-slate-500">
                     {tCommon('jod')} / {isRtl ? 'شهرياً' : 'monthly'}
                   </span>
                 </div>
 
                 <p className="text-xs text-slate-400 font-medium mb-6">
-                  {pkg.price_jod === 0 
+                  {pkg.price_monthly === 0 
                     ? (isRtl ? 'ظهور أساسي مجاني دائماً للمزود' : 'Always free for basic clinical exposure')
                     : (isRtl ? 'فوترة شهرية مرنة ودعم فني متكامل' : 'Flexible monthly billing with technical support')
                   }
@@ -145,7 +145,7 @@ export default function PackageToggle({ doctorPackages, hospitalPackages }: Pack
 
                 {/* Features List */}
                 <ul className="space-y-3.5 mb-8 text-sm font-medium text-slate-600">
-                  {pkg.features.map((feat, index) => (
+                  {(isRtl ? pkg.features_ar : pkg.features_en).map((feat, index) => (
                     <li key={index} className="flex items-start gap-2.5 font-cairo">
                       <Check className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
                       <span className="leading-tight">{feat}</span>
