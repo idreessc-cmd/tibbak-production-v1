@@ -5,6 +5,10 @@ import { mockCities } from '@/data/mock/cities';
 import FavoritesView from '@/components/search/FavoritesView';
 import type { Metadata } from 'next';
 
+export function generateStaticParams() {
+  return [{ locale: 'ar' }, { locale: 'en' }];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const isRtl = locale === 'ar';

@@ -2,6 +2,10 @@ import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { User, LogIn } from 'lucide-react';
 
+export function generateStaticParams() {
+  return [{ locale: 'ar' }, { locale: 'en' }];
+}
+
 interface PlaceholderProps {
   params: Promise<{ locale: string }>;
 }
