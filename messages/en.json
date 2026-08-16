@@ -64,6 +64,7 @@
     "cta_btn_hospital": "Register your Hospital Now"
   },
   "doctors": {
+    "verified": "Verified Doctor",
     "title": "Doctors Directory in Jordan",
     "subtitle": "Search and compare leading doctors and consultants by specialty, city, and rating.",
     "filter_all_specialties": "All Specialties",

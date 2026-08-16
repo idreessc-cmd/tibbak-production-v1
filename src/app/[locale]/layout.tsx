@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { Cairo, Inter } from 'next/font/google';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import MobileBottomNav from '@/components/mobile/MobileBottomNav';
 import '../globals.css';
 
 const cairo = Cairo({
@@ -52,10 +53,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
       <body className={`min-h-screen flex flex-col antialiased ${locale === 'ar' ? 'font-cairo' : 'font-sans'}`}>
         <NextIntlClientProvider messages={messages}>
           <Header />
-          <main className="flex-1 flex flex-col">
+          <main className="flex-1 flex flex-col pb-20 md:pb-0 overflow-x-hidden">
             {children}
           </main>
           <Footer />
+          <MobileBottomNav />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -45,3 +45,8 @@ next-env.d.ts
 .wrangler/
 .dev.vars
 test-cloudflare-preview.mjs
+
+# temporary qa scripts and screenshots
+capture-*.mjs
+scratch/
+
