@@ -127,6 +127,13 @@ export interface Doctor {
   address_ar: string;
   address_en: string;
   first_available_date: string; // e.g. "2026-07-24"
+
+  // Phase 4 Doctor Offer Fields (Demo/Local State)
+  offer_enabled?: boolean;
+  offer_type?: 'percentage' | 'fixed';
+  offer_value?: number;
+  offer_start_date?: string; // ISO datetime string
+  offer_end_date?: string;   // ISO datetime string
 }
 
 export interface CaseStatusHistory {

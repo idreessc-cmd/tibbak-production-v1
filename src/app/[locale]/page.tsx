@@ -5,6 +5,8 @@ import { getAllHospitals } from '@/lib/repositories/hospitals';
 import { mockSpecialties } from '@/data/mock/specialties';
 import { mockCities } from '@/data/mock/cities';
 import SearchBar from '@/components/home/SearchBar';
+import MobileHeroSearch from '@/components/home/MobileHeroSearch';
+import QuickSearchFilters from '@/components/home/QuickSearchFilters';
 import DemoDataBanner from '@/components/shared/DemoDataBanner';
 import { 
   ShieldCheck, CheckCircle, ChevronRight, Award, MapPin, 
@@ -36,8 +38,14 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <div className="flex flex-col w-full pb-20">
       
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-b from-teal-50/60 via-white to-transparent pt-10 pb-16 border-b border-slate-100">
+      {/* Mobile Top Area: Search -> Quick Filters (Mobile Only) */}
+      <div className="md:hidden bg-slate-50/50 pt-3 pb-4 px-4 border-b border-slate-100 space-y-3">
+        <MobileHeroSearch />
+        <QuickSearchFilters />
+      </div>
+
+      {/* Desktop Hero Section (Desktop Only) */}
+      <section className="hidden md:block relative bg-gradient-to-b from-teal-50/60 via-white to-transparent pt-10 pb-16 border-b border-slate-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
           
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-teal-50 text-teal-800 border border-teal-150 font-cairo">
@@ -53,7 +61,7 @@ export default async function HomePage({ params }: HomePageProps) {
             {isRtl ? heroSubAr : heroSubEn}
           </p>
 
-          {/* Booking.com Style Unified Search Bar */}
+          {/* Desktop Booking.com Style Unified Search Bar */}
           <div className="pt-2">
             <SearchBar 
               specialties={mockSpecialties}
