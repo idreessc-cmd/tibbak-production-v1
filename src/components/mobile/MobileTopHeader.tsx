@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { Menu, X, HeartPulse, Globe, Stethoscope, User } from 'lucide-react';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 export default function MobileTopHeader() {
   const locale = useLocale();
@@ -12,7 +13,16 @@ export default function MobileTopHeader() {
   const isAr = locale === 'ar';
   const [isOpen, setIsOpen] = useState(false);
 
+  // Lock body scroll when drawer is open & handle Escape key
+  useBodyScrollLock(isOpen, () => setIsOpen(false));
+
+  // Automatically close menu on route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
   const switchLanguage = () => {
+    setIsOpen(false);
     const nextLocale = isAr ? 'en' : 'ar';
     router.replace(pathname, { locale: nextLocale });
   };
@@ -32,6 +42,7 @@ export default function MobileTopHeader() {
         {/* Brand Logo */}
         <Link 
           href="/" 
+          onClick={() => setIsOpen(false)}
           className="flex items-center gap-2 text-teal-600 focus:outline-none"
           aria-label={isAr ? 'الرئيسية - طبّك' : 'Home - Tabibak'}
         >
@@ -70,47 +81,70 @@ export default function MobileTopHeader() {
 
       </div>
 
-      {/* Mobile Drawer Dropdown Overlay */}
+      {/* Mobile Drawer Dropdown Overlay & Full Backdrop */}
       {isOpen && (
-        <div className="fixed inset-x-0 top-14 bg-white/98 border-b border-slate-200 shadow-xl z-50 p-4 space-y-4 animate-in slide-in-from-top-2 duration-200 dir-auto" dir={isAr ? 'rtl' : 'ltr'}>
-          <nav className="flex flex-col space-y-1 font-cairo">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all ${
-                    isActive 
-                      ? 'bg-teal-50 text-teal-700 font-black' 
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
-                >
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
+        <div 
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex flex-col justify-start dir-auto animate-in fade-in duration-200"
+          dir={isAr ? 'rtl' : 'ltr'}
+          onClick={() => setIsOpen(false)}
+        >
+          <div 
+            className="w-full max-h-[85dvh] bg-white border-b border-slate-200 shadow-2xl p-5 space-y-4 overflow-y-auto overscroll-contain pb-[calc(1.5rem+env(safe-area-inset-bottom))] animate-in slide-in-from-top-2 duration-200 font-cairo"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span className="text-sm font-black text-slate-900">
+                {isAr ? 'القائمة الرئيسية' : 'Main Menu'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label={isAr ? 'إغلاق القائمة' : 'Close Menu'}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-          <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-2 font-cairo">
-            <Link
-              href="/join-doctor"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
-            >
-              <Stethoscope className="h-4 w-4 text-teal-600" />
-              <span>{isAr ? 'انضم كطبيب' : 'For Doctors'}</span>
-            </Link>
+            <nav className="flex flex-col space-y-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all ${
+                      isActive 
+                        ? 'bg-teal-50 text-teal-700 font-black' 
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
 
-            <Link
-              href="/login"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl transition-colors shadow-xs"
-            >
-              <User className="h-4 w-4" />
-              <span>{isAr ? 'تسجيل الدخول' : 'Sign In'}</span>
-            </Link>
+            <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
+              <Link
+                href="/join-doctor"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+              >
+                <Stethoscope className="h-4 w-4 text-teal-600" />
+                <span>{isAr ? 'انضم كطبيب' : 'For Doctors'}</span>
+              </Link>
+
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl transition-colors shadow-xs"
+              >
+                <User className="h-4 w-4" />
+                <span>{isAr ? 'تسجيل الدخول' : 'Sign In'}</span>
+              </Link>
+            </div>
           </div>
         </div>
       )}

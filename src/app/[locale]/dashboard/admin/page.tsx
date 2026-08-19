@@ -41,6 +41,7 @@ import {
   Search, Lock, Bell, ShieldCheck, Sparkles, 
   RotateCcw, FileText, X, Tag
 } from 'lucide-react';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 type AdminTab = 
   | 'overview' | 'providers' | 'verification' | 'cases_appointments' 
@@ -88,6 +89,10 @@ function AdminDashboardContent() {
   const [newCampaignPlacement, setNewCampaignPlacement] = useState<'search_top' | 'home_featured' | 'specialty_banner'>('search_top');
 
   const [selectedAuditLog, setSelectedAuditLog] = useState<AdminAuditEvent | null>(null);
+
+  // Lock body scroll when admin modals are open & handle Escape key
+  useBodyScrollLock(suspendModalProvider !== null, () => setSuspendModalProvider(null));
+  useBodyScrollLock(selectedAuditLog !== null, () => setSelectedAuditLog(null));
 
   // Admin Notifications Dropdown
   const [showNotifMenu, setShowNotifMenu] = useState(false);
@@ -540,8 +545,14 @@ function AdminDashboardContent() {
 
         {/* Modal: Provider Suspension Form */}
         {suspendModalProvider && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 text-right rtl:text-right ltr:text-left">
+          <div 
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200"
+            onClick={() => setSuspendModalProvider(null)}
+          >
+            <div 
+              className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 text-right rtl:text-right ltr:text-left animate-scale-up"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h4 className="text-base font-black text-rose-900">{isRtl ? `توقيف مزود الخدمة: ${suspendModalProvider.name_ar}` : `Suspend Provider: ${suspendModalProvider.name_en}`}</h4>
                 <button onClick={() => setSuspendModalProvider(null)} className="cursor-pointer font-black"><X className="h-5 w-5" /></button>
@@ -881,8 +892,14 @@ function AdminDashboardContent() {
 
         {/* Modal: Audit Log Drawer */}
         {selectedAuditLog && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-right rtl:text-right ltr:text-left">
+          <div 
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200"
+            onClick={() => setSelectedAuditLog(null)}
+          >
+            <div 
+              className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-right rtl:text-right ltr:text-left animate-scale-up"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h4 className="text-base font-black text-slate-900">{isRtl ? `تفاصيل سجل التدقيق: ${selectedAuditLog.id}` : `Audit Log Detail: ${selectedAuditLog.id}`}</h4>
                 <button onClick={() => setSelectedAuditLog(null)} className="cursor-pointer font-black"><X className="h-5 w-5" /></button>

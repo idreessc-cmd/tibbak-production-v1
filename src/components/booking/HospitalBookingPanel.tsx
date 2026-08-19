@@ -6,6 +6,7 @@ import { useRouter } from '@/i18n/routing';
 import { User, Phone, Globe, MapPin, ClipboardList, Upload, CheckCircle2, Loader2, Sparkles, Building2 } from 'lucide-react';
 import { Hospital } from '@/types';
 import { completeDemoBooking } from '@/lib/bookings/complete-demo-booking';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 interface HospitalBookingPanelProps {
   hospital: Hospital;
@@ -17,6 +18,9 @@ export default function HospitalBookingPanel({ hospital }: HospitalBookingPanelP
   const router = useRouter();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Lock body scroll when modal is open & handle Escape key
+  useBodyScrollLock(isModalOpen, () => setIsModalOpen(false));
   const [step, setStep] = useState(1);
   const [caseId, setCaseId] = useState('');
 
@@ -134,8 +138,14 @@ export default function HospitalBookingPanel({ hospital }: HospitalBookingPanelP
 
       {/* Hospital Booking Wizard Modal Overlay */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-scale-up">
+        <div 
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
             
             {/* Modal Header */}
             <div className="bg-slate-50 px-6 py-4.5 border-b border-slate-100 flex items-center justify-between">

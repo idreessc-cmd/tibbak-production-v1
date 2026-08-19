@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
+import { usePathname } from '@/i18n/routing';
 import { Specialty, City } from '@/types';
 import { X, SlidersHorizontal, Check, RefreshCw } from 'lucide-react';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 interface MobileFilterDrawerProps {
   specialties: Specialty[];
@@ -24,8 +26,17 @@ export default function MobileFilterDrawer({
   onApplyFilters,
 }: MobileFilterDrawerProps) {
   const locale = useLocale();
+  const pathname = usePathname();
   const isAr = locale === 'ar';
   const [isOpen, setIsOpen] = useState(false);
+
+  // Lock body scroll when drawer is open & handle Escape key
+  useBodyScrollLock(isOpen, () => setIsOpen(false));
+
+  // Automatically close filter drawer on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   const [selectedSpecialty, setSelectedSpecialty] = useState(currentFilters.specialty || '');
   const [selectedCity, setSelectedCity] = useState(currentFilters.city || '');
@@ -77,9 +88,13 @@ export default function MobileFilterDrawer({
 
       {/* Bottom Sheet Backdrop & Drawer Container */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 backdrop-blur-xs dir-auto animate-in fade-in duration-200" dir={isAr ? 'rtl' : 'ltr'}>
+        <div 
+          className="fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 backdrop-blur-xs dir-auto animate-in fade-in duration-200" 
+          dir={isAr ? 'rtl' : 'ltr'}
+          onClick={() => setIsOpen(false)}
+        >
           <div 
-            className="w-full max-h-[85vh] bg-white rounded-t-3xl border-t border-slate-100 shadow-2xl flex flex-col font-cairo animate-in slide-in-from-bottom duration-300 overflow-hidden"
+            className="w-full max-h-[88dvh] bg-white rounded-t-3xl border-t border-slate-100 shadow-2xl flex flex-col font-cairo animate-in slide-in-from-bottom duration-300 overflow-hidden pb-[calc(1rem+env(safe-area-inset-bottom))]"
             onClick={(e) => e.stopPropagation()}
           >
             
@@ -95,13 +110,14 @@ export default function MobileFilterDrawer({
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label={isAr ? 'إغلاق الفلترة' : 'Close Filter Drawer'}
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Drawer Body (Scrollable) */}
-            <div className="p-5 space-y-6 overflow-y-auto flex-1">
+            <div className="p-5 space-y-6 overflow-y-auto overscroll-contain flex-1">
               
               {/* 1. Sorting */}
               <div className="space-y-2">
