@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { executeDemoEnvironmentReset } from '@/lib/demo/admin-demo-reset';
 import { RotateCcw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 interface AdminDemoSettingsProps {
   isDemoMode: boolean;
@@ -12,6 +13,9 @@ interface AdminDemoSettingsProps {
 
 export default function AdminDemoSettings({ isDemoMode, isRtl, onResetComplete }: AdminDemoSettingsProps) {
   const [confirmModal, setConfirmModal] = useState(false);
+
+  // Lock body scroll when confirmation modal is open & handle Escape key
+  useBodyScrollLock(confirmModal, () => setConfirmModal(false));
   const [resetDoneNotice, setResetDoneNotice] = useState(false);
 
   if (!isDemoMode) {
@@ -62,8 +66,14 @@ export default function AdminDemoSettings({ isDemoMode, isRtl, onResetComplete }
 
       {/* Confirmation Modal */}
       {confirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-100 space-y-4 text-right rtl:text-right ltr:text-left">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setConfirmModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-100 space-y-4 text-right rtl:text-right ltr:text-left animate-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3 text-amber-600">
               <AlertTriangle className="h-6 w-6" />
               <h4 className="font-black text-slate-900 text-lg">

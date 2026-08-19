@@ -50,7 +50,7 @@ export default function MobileBottomNav() {
   return (
     <nav 
       aria-label={isAr ? 'التنقل السفلي للهاتف' : 'Mobile Bottom Navigation'}
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200/90 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] md:hidden dir-auto pb-[env(safe-area-inset-bottom)]"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200/90 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] md:hidden dir-auto pb-[env(safe-area-inset-bottom)]"
       dir={isAr ? 'rtl' : 'ltr'}
     >
       <div className="flex h-16 items-center justify-around px-1 max-w-md mx-auto">

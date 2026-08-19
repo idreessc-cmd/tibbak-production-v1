@@ -30,7 +30,7 @@ export default function Header() {
       <MobileTopHeader />
 
       {/* Desktop Full Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur-md hidden md:block dir-auto" dir={isAr ? 'rtl' : 'ltr'}>
+      <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/95 backdrop-blur-md hidden md:block dir-auto" dir={isAr ? 'rtl' : 'ltr'}>
         <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Logo */}

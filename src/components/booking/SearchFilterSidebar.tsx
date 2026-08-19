@@ -6,6 +6,7 @@ import { useRouter, usePathname } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, ArrowUpDown, ShieldCheck, Video, X } from 'lucide-react';
 import { City, Specialty } from '@/types';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 interface SearchFilterSidebarProps {
   specialties: Specialty[];
@@ -20,6 +21,9 @@ export default function SearchFilterSidebar({ specialties, cities }: SearchFilte
   const searchParams = useSearchParams();
 
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Lock body scroll when mobile filter sidebar is open & handle Escape key
+  useBodyScrollLock(isMobileOpen, () => setIsMobileOpen(false));
 
   // Load initial values from searchParams
   const [selectedSpecialty, setSelectedSpecialty] = useState(searchParams.get('specialty') || '');
@@ -300,8 +304,14 @@ export default function SearchFilterSidebar({ specialties, cities }: SearchFilte
 
       {/* Mobile Slide-Over Drawer Sheet */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex justify-end bg-black/40 backdrop-blur-xs">
-          <div className="w-full max-w-xs bg-white h-full p-6 overflow-y-auto shadow-2xl space-y-6 flex flex-col justify-between">
+        <div 
+          className="fixed inset-0 z-50 lg:hidden flex justify-end bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setIsMobileOpen(false)}
+        >
+          <div 
+            className="w-full max-w-xs bg-white h-full p-6 overflow-y-auto overscroll-contain shadow-2xl space-y-6 flex flex-col justify-between animate-in slide-in-from-right duration-300 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div>
               <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                 <span className="text-sm font-black text-slate-800 font-cairo">{isRtl ? 'خيارات التصفية' : 'Search Filters'}</span>
